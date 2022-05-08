@@ -2,22 +2,21 @@ package main;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.HashSet;
 
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
-public class Game extends JFrame implements KeyListener{
+public class Game extends JFrame implements KeyListener, Runnable{
 
+	private static final float Hz = 1/60.0f;
+	
 	double x = 0;
 	double y = 0;
 	
-	/**
-	 * Movement speed in m/s.
-	 */
 	static final double SPEED = 5.0;
 	
 	boolean[] WASD = new boolean[] {false, false, false, false};
+	
 	
 	public Game() {
 		super("Game");
@@ -28,17 +27,47 @@ public class Game extends JFrame implements KeyListener{
 		this.setResizable(false);
 		
 		addKeyListener(this);
-		
 		this.setVisible(true);
+		
+		new Thread(this).start();
 		
 	}
 	
-	public void move(long elapsedTime) {
-		if (WASD[0]) y += SPEED * (elapsedTime / 1000.0);
-		if (WASD[2]) y -= SPEED * (elapsedTime / 1000.0);
+	@Override
+	public void run() {
 		
-		if (WASD[1]) x -= SPEED * (elapsedTime / 1000.0);
-		if (WASD[3]) x += SPEED * (elapsedTime / 1000.0);
+		long timeLast = System.nanoTime();
+		float theta = 0;
+		
+		while (true) {
+			long timeNow = System.nanoTime();
+			long elapsedTime = timeNow - timeLast;
+			theta += elapsedTime / 1000000000.0f;
+			timeLast = timeNow;
+			
+			while (theta >= Hz) {
+				
+				double xLast = x;
+				double yLast = y;
+				move();
+				
+				if (xLast != x || yLast != y) printStats();
+				
+				theta -= Hz;
+			}
+			
+		}
+		
+	}
+	
+	public void move() {
+		double distance = SPEED * Hz;
+		
+		y += WASD[0] ? distance : 0;
+		y -= WASD[2] ? distance : 0;
+		
+		x -= WASD[1] ? distance : 0;
+		x += WASD[3] ? distance : 0;
 	}
 	
 	void printStats() {
@@ -48,13 +77,9 @@ public class Game extends JFrame implements KeyListener{
 
 	@Override
 	public void keyTyped(KeyEvent e) {}
-
-	long timeLast = 0;
 	
 	@Override
 	public void keyPressed(KeyEvent e) {
-		long elapsedTime = timeLast == 0 ? 0 : e.getWhen() - timeLast;
-		timeLast = e.getWhen();
 
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_W:
@@ -71,18 +96,11 @@ public class Game extends JFrame implements KeyListener{
 			break;
 		}
 		
-
-		
-		move(elapsedTime);
-		printStats();
 	}
 
 
 	@Override
 	public void keyReleased(KeyEvent e) {
-		long elapsedTime = e.getWhen() - timeLast;
-		
-		move(elapsedTime);
 		
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_W:
@@ -104,9 +122,8 @@ public class Game extends JFrame implements KeyListener{
 			new OptionsMenu();
 		}
 		
-		timeLast = (WASD[0] || WASD[1] || WASD[2] || WASD[3]) ? e.getWhen() : 0;
-		printStats();
-		
 	}
+
+	
 	
 }
