@@ -1,32 +1,45 @@
 package main;
 
+import java.awt.Canvas;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Shape;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.util.HashSet;
 
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
-public class Game extends JFrame implements KeyListener, Runnable{
+public class Game extends JFrame implements Runnable{
 
-	private static final float Hz = 1/60.0f;
+	boolean running = true;
 	
-	double x = 0;
-	double y = 0;
+	public static final float Hz = 1/60.0f;
 	
-	static final double SPEED = 5.0;
+	private Screen screen;
+	HashSet<Integer> keysPressed = new HashSet<>();
 	
-	boolean[] WASD = new boolean[] {false, false, false, false};
-	
+	private Player player;
 	
 	public Game() {
 		super("Game");
 		
-		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		this.pack();
-		this.setLocationRelativeTo(null);
+		
+		this.player = new Player(this);
+		
+
+		this.screen = new Screen();
+		this.add(screen);
+		
+		this.addKeyListener(new InputHandler());
+		
+		
+		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE); // TODO WindowListener
 		this.setResizable(false);
 		
-		addKeyListener(this);
+		this.pack();
+		this.setLocationRelativeTo(null);
 		this.setVisible(true);
 		
 		new Thread(this).start();
@@ -39,7 +52,7 @@ public class Game extends JFrame implements KeyListener, Runnable{
 		long timeLast = System.nanoTime();
 		float theta = 0;
 		
-		while (true) {
+		while (running) {
 			long timeNow = System.nanoTime();
 			long elapsedTime = timeNow - timeLast;
 			theta += elapsedTime / 1000000000.0f;
@@ -47,11 +60,7 @@ public class Game extends JFrame implements KeyListener, Runnable{
 			
 			while (theta >= Hz) {
 				
-				double xLast = x;
-				double yLast = y;
-				move();
-				
-				if (xLast != x || yLast != y) printStats();
+				update();
 				
 				theta -= Hz;
 			}
@@ -60,70 +69,59 @@ public class Game extends JFrame implements KeyListener, Runnable{
 		
 	}
 	
-	public void move() {
-		double distance = SPEED * Hz;
+	private void update() {
+		// Reads inputs on update
+		player.update();
+		screen.update(screen.getGraphics());
 		
-		y += WASD[0] ? distance : 0;
-		y -= WASD[2] ? distance : 0;
+	}
+
+
+	class Screen extends Canvas {
 		
-		x -= WASD[1] ? distance : 0;
-		x += WASD[3] ? distance : 0;
-	}
-	
-	void printStats() {
-		System.out.println("X: " + x + " | Y: " + y);
-	}
-	
-
-	@Override
-	public void keyTyped(KeyEvent e) {}
-	
-	@Override
-	public void keyPressed(KeyEvent e) {
-
-		switch (e.getKeyCode()) {
-		case KeyEvent.VK_W:
-			WASD[0] = true;
-			break;
-		case KeyEvent.VK_A:
-			WASD[1] = true;
-			break;
-		case KeyEvent.VK_S:
-			WASD[2] = true;
-			break;
-		case KeyEvent.VK_D:
-			WASD[3] = true;
-			break;
+		Screen(){
+			this.setSize(1280, 720);
+			this.setBackground(Color.black);
+			this.setFocusable(false);
+		}
+		
+		@Override
+		public void paint(Graphics g) {
+			g.setColor(Color.white);
+			g.drawOval((int) player.x - 5, (int) player.z - 5, 9, 9);
+			// TODO Draw player -> Projection
+			g.dispose();
 		}
 		
 	}
 
-
-	@Override
-	public void keyReleased(KeyEvent e) {
+	class InputHandler extends KeyAdapter {
 		
-		switch (e.getKeyCode()) {
-		case KeyEvent.VK_W:
-			WASD[0] = false;
-			break;
-		case KeyEvent.VK_A:
-			WASD[1] = false;
-			break;
-		case KeyEvent.VK_S:
-			WASD[2] = false;
-			break;
-		case KeyEvent.VK_D:
-			WASD[3] = false;
-			break;
+		@Override
+		public void keyPressed(KeyEvent e) {
+			keysPressed.add(e.getKeyCode());
+		}
+
+
+		@Override
+		public void keyReleased(KeyEvent e) {
 			
-		case KeyEvent.VK_ENTER: //TODO Change to escape
-			//TODO Save game
-			dispose();
-			new OptionsMenu();
+			// Not on update
+			switch (e.getKeyCode()) {
+			case KeyEvent.VK_ENTER: // TODO Set to ESCAPE
+				// TODO Save game
+				dispose();
+				running = false;
+				new OptionsMenu();
+				break;
+			case KeyEvent.VK_P: // Debug
+				player.printPlayerInfo();
+				break;
+			}
+			
+			keysPressed.remove(e.getKeyCode());
 		}
 		
 	}
-
-	
 	
 }
