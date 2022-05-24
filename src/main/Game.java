@@ -1,26 +1,21 @@
 package main;
 
-import java.awt.Canvas;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Shape;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.util.HashSet;
 
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
+@SuppressWarnings("serial")
 public class Game extends JFrame implements Runnable{
 
-	boolean running = true;
+	private boolean running = true;
 	
 	public static final float Hz = 1/60.0f;
 	
-	private Screen screen;
-	HashSet<Integer> keysPressed = new HashSet<>();
+	private GameScreen screen;
+	private HashSet<Integer> keysPressed = new HashSet<>();
 	
-	private Player player;
+	public Player player;
 	
 	public Game() {
 		super("Game");
@@ -29,10 +24,10 @@ public class Game extends JFrame implements Runnable{
 		this.player = new Player(this);
 		
 
-		this.screen = new Screen();
+		this.screen = new GameScreen(this);
 		this.add(screen);
 		
-		this.addKeyListener(new InputHandler());
+		this.addKeyListener(new GameInput(this));
 		
 		
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE); // TODO WindowListener
@@ -42,6 +37,7 @@ public class Game extends JFrame implements Runnable{
 		this.setLocationRelativeTo(null);
 		this.setVisible(true);
 		
+		this.running = true;
 		new Thread(this).start();
 		
 	}
@@ -58,7 +54,7 @@ public class Game extends JFrame implements Runnable{
 			theta += elapsedTime / 1000000000.0f;
 			timeLast = timeNow;
 			
-			while (theta >= Hz) {
+			while (theta >= Hz) { // TODO if Hz = null use elapsedTime
 				
 				update();
 				
@@ -67,61 +63,41 @@ public class Game extends JFrame implements Runnable{
 			
 		}
 		
+		// TODO Save game
+		dispose();	
+		new OptionsMenu();
+
+		
 	}
 	
 	private void update() {
 		// Reads inputs on update
 		player.update();
 		screen.update(screen.getGraphics());
-		
 	}
 
-
-	class Screen extends Canvas {
-		
-		Screen(){
-			this.setSize(1280, 720);
-			this.setBackground(Color.black);
-			this.setFocusable(false);
-		}
-		
-		@Override
-		public void paint(Graphics g) {
-			g.setColor(Color.white);
-			g.drawOval((int) player.x - 5, (int) player.z - 5, 9, 9);
-			// TODO Draw player -> Projection
-			g.dispose();
-		}
-		
+	public int getScreenWidth() {
+		return screen.getWidth();
 	}
-
-	class InputHandler extends KeyAdapter {
-		
-		@Override
-		public void keyPressed(KeyEvent e) {
-			keysPressed.add(e.getKeyCode());
-		}
-
-
-		@Override
-		public void keyReleased(KeyEvent e) {
-			
-			// Not on update
-			switch (e.getKeyCode()) {
-			case KeyEvent.VK_ENTER: // TODO Set to ESCAPE
-				// TODO Save game
-				dispose();
-				running = false;
-				new OptionsMenu();
-				break;
-			case KeyEvent.VK_P: // Debug
-				player.printPlayerInfo();
-				break;
-			}
-			
-			keysPressed.remove(e.getKeyCode());
-		}
-		
+	
+	public int getScreenHeight() {
+		return screen.getHeight();
+	}
+	
+	public boolean isPressed(int key) {
+		return keysPressed.contains(key);
+	}
+	
+	public void addPressedKey(int key) {
+		keysPressed.add(key);
+	}
+	
+	public void removePressedKey(int key) {
+		keysPressed.remove(key);
+	}
+	
+	public void stop() {
+		running = false;
 	}
 	
 }

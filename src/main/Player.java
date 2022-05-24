@@ -1,15 +1,16 @@
 package main;
 
+import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 
 public class Player {
 
-	private Game gameEnv;
+	private final Game GAME;
 	
 	public double x,y,z;
 	private double speed;
 	
-	private static final double[/* triangle */][/* point */][/* x y z */] MODEL = {
+	public static final double[/* triangle */][/* point */][/* x y z */] MODEL = {
 			// south (front)
 			{{0,0,0},  {0,1,0},  {1,1,0}},
 			{{0,0,0},  {1,1,0},  {1,0,0}},
@@ -37,7 +38,7 @@ public class Player {
 		
 		this.speed = 100.0;
 		
-		this.gameEnv = game;
+		this.GAME = game;
 	}
 	
 	void update() {
@@ -45,12 +46,17 @@ public class Player {
 		move();
 	}
 	
+	public void paint(Graphics g) {
+		// TODO Render player, minimal Calculations Projection
+	}
+	
 	void move() {
 		
-		if (gameEnv.keysPressed.contains(KeyEvent.VK_W)) z += gameEnv.Hz * speed; // +/- Z Forward?
-		if (gameEnv.keysPressed.contains(KeyEvent.VK_S)) z -= gameEnv.Hz * speed;
-		if (gameEnv.keysPressed.contains(KeyEvent.VK_A)) x -= gameEnv.Hz * speed;
-		if (gameEnv.keysPressed.contains(KeyEvent.VK_D)) x += gameEnv.Hz * speed;
+		// TODO Custom key mapping
+		if (GAME.isPressed(KeyEvent.VK_W)) z += Game.Hz * speed; // +/- Z Forward?
+		if (GAME.isPressed(KeyEvent.VK_A)) x -= Game.Hz * speed;
+		if (GAME.isPressed(KeyEvent.VK_S)) z -= Game.Hz * speed;
+		if (GAME.isPressed(KeyEvent.VK_D)) x += Game.Hz * speed;
 		
 		// TODO World
 	}
