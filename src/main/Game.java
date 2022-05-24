@@ -1,5 +1,7 @@
 package main;
 
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.HashSet;
 
 import javax.swing.JFrame;
@@ -27,7 +29,7 @@ public class Game extends JFrame implements Runnable{
 		this.screen = new GameScreen(this);
 		this.add(screen);
 		
-		this.addKeyListener(new GameInput(this));
+		this.addKeyListener(new InputHandler());
 		
 		
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE); // TODO WindowListener
@@ -66,13 +68,14 @@ public class Game extends JFrame implements Runnable{
 		// TODO Save game
 		dispose();	
 		new OptionsMenu();
-
 		
 	}
 	
 	private void update() {
 		// Reads inputs on update
 		player.update();
+		
+		
 		screen.update(screen.getGraphics());
 	}
 
@@ -88,16 +91,30 @@ public class Game extends JFrame implements Runnable{
 		return keysPressed.contains(key);
 	}
 	
-	public void addPressedKey(int key) {
-		keysPressed.add(key);
-	}
-	
-	public void removePressedKey(int key) {
-		keysPressed.remove(key);
-	}
-	
-	public void stop() {
-		running = false;
+	class InputHandler extends KeyAdapter {
+		
+		@Override
+		public void keyPressed(KeyEvent e) {
+			keysPressed.add(e.getKeyCode());
+		}
+
+
+		@Override
+		public void keyReleased(KeyEvent e) {
+			
+			// Not on update
+			switch (e.getKeyCode()) {
+			case KeyEvent.VK_ENTER: // TODO Set to ESCAPE
+				running = false;
+				break;
+			case KeyEvent.VK_P: // Debug
+				player.printPlayerInfo();
+				break;
+			}
+			
+			keysPressed.remove(e.getKeyCode());
+		}
+		
 	}
 	
 }

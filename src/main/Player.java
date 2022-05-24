@@ -5,31 +5,12 @@ import java.awt.event.KeyEvent;
 
 public class Player {
 
-	private final Game GAME;
+	private final Game game;
 	
 	public double x,y,z;
 	private double speed;
 	
-	public static final double[/* triangle */][/* point */][/* x y z */] MODEL = {
-			// south (front)
-			{{0,0,0},  {0,1,0},  {1,1,0}},
-			{{0,0,0},  {1,1,0},  {1,0,0}},
-			// top (from south)
-			{{0,1,0},  {0,1,1},  {1,1,1}},
-			{{0,1,0},  {1,1,1},  {1,1,0}},
-			// north (from top)
-			{{0,1,1},  {0,0,1},  {1,0,1}},
-			{{0,1,1},  {1,0,1},  {1,1,1}},
-			// bottom (from north)
-			{{0,0,1},  {0,0,0},  {1,0,0}},
-			{{0,0,1},  {1,0,0},  {1,0,1}},
-			// west (from south)
-			{{0,0,1},  {0,1,1},  {0,1,0}},
-			{{0,0,1},  {0,1,0},  {0,0,0}},
-			// east (from south)
-			{{1,0,0},  {1,1,0},  {1,1,1}},
-			{{1,0,0},  {1,1,1},  {1,0,1}}
-	};
+	public static final Model MODEL = Model.CUBE;
 	
 	Player(Game game) {
 		this.x = 0;
@@ -38,7 +19,7 @@ public class Player {
 		
 		this.speed = 100.0;
 		
-		this.GAME = game;
+		this.game = game;
 	}
 	
 	void update() {
@@ -46,6 +27,7 @@ public class Player {
 		move();
 	}
 	
+	// TODO Use in GameScreen.paint(+), implement in Entity Class
 	public void paint(Graphics g) {
 		// TODO Render player, minimal Calculations Projection
 	}
@@ -53,10 +35,10 @@ public class Player {
 	void move() {
 		
 		// TODO Custom key mapping
-		if (GAME.isPressed(KeyEvent.VK_W)) z += Game.Hz * speed; // +/- Z Forward?
-		if (GAME.isPressed(KeyEvent.VK_A)) x -= Game.Hz * speed;
-		if (GAME.isPressed(KeyEvent.VK_S)) z -= Game.Hz * speed;
-		if (GAME.isPressed(KeyEvent.VK_D)) x += Game.Hz * speed;
+		if (game.isPressed(KeyEvent.VK_W)) z += Game.Hz * speed; // +/- Z Forward?
+		if (game.isPressed(KeyEvent.VK_A)) x -= Game.Hz * speed;
+		if (game.isPressed(KeyEvent.VK_S)) z -= Game.Hz * speed;
+		if (game.isPressed(KeyEvent.VK_D)) x += Game.Hz * speed;
 		
 		// TODO World
 	}
