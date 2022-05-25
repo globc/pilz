@@ -22,10 +22,7 @@ public class GameScreen extends Canvas{
 	public void paint(Graphics g) {
 		g.setColor(Color.white);
 		
-		// TODO Delete?
-		float centerX = (getWidth() - 1) / 2.0f;
-		float centerY = (getHeight() - 1) / 2.0f;
-		float aspectRatio = getHeight() / getWidth();
+		game.player.paint(g);
 		
 		g.dispose();
 	}
