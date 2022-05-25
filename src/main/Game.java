@@ -1,5 +1,6 @@
 package main;
 
+import java.awt.Graphics;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.HashSet;
@@ -76,9 +77,14 @@ public class Game extends JFrame implements Runnable{
 		player.update();
 		
 		
-		screen.update(screen.getGraphics());
+		screen.update(getGraphics());
 	}
 
+	@Override
+	public Graphics getGraphics() {
+		return screen.getGraphics();
+	}
+	
 	public int getScreenWidth() {
 		return screen.getWidth();
 	}
