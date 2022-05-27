@@ -82,7 +82,7 @@ public class Game extends JFrame implements Runnable{
 
 	@Override
 	public Graphics getGraphics() {
-		return screen.getGraphics();
+		return screen.getGraphics(); // TODO BufferStrategy?
 	}
 	
 	public int getScreenWidth() {

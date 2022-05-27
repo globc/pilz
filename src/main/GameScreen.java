@@ -3,7 +3,6 @@ package main;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Polygon;
 
 @SuppressWarnings("serial")
 public class GameScreen extends Canvas{
