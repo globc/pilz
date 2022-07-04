@@ -20,6 +20,8 @@ public class Game extends JFrame implements Runnable{
 	
 	public Player player;
 	
+	public Vec3d camera = new Vec3d(0, 0, 0);
+	
 	public Game() {
 		super("Game");
 		

@@ -7,7 +7,7 @@ import java.awt.Graphics;
 public class Mesh { 
 	
 	Triangle[] tris;
-	
+	boolean transparent = false; // TODO Move to Model class
 	
 	Mesh(Triangle[] triangles){
 		this.tris = triangles;
@@ -90,7 +90,13 @@ class Triangle {
 	}
 	
 	public Vec3d getNormal() {
-		return null;
+		Vec3d v1 = new Vec3d(p[0], p[1]);
+		Vec3d v2 = new Vec3d(p[0], p[2]);
+		
+		return new Vec3d (
+				v1.y * v2.z - v1.z * v2.y,
+				v1.z * v2.x - v1.x * v2.z,
+				v1.x * v2.y - v1.y * v2.x);
 	}
 	
 }
@@ -98,6 +104,12 @@ class Triangle {
 class Vec3d {
 	
 	public double x, y, z;
+	
+	Vec3d(Vec3d from, Vec3d to){
+		this.x = to.x - from.x;
+		this.y = to.y - from.y;
+		this.z = to.z - from.z;
+	}
 	
 	Vec3d(double x, double y, double z){
 		this.x = x;
@@ -114,6 +126,20 @@ class Vec3d {
 		// z = ...
 	}
 	
+	public void normalize() {
+		double length = getLength();
+		
+		x /= length;
+		y /= length;
+		z /= length;
+	}
 	
+	public static double scalarProduct(Vec3d v1, Vec3d v2) {
+		return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+	}
+	
+	public double getLength() {
+		return Math.sqrt(x * x + y * y + z * z);
+	}
 	
 }

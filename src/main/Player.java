@@ -34,8 +34,13 @@ public class Player {
 		
 		for (Triangle tri : modelCopy.tris) {
 			tri.translate(x, y, z);
-			tri.project(game.getScreenWidth() / 2, game.getScreenHeight() / 2);
-			tri.paint(g);
+			
+			if (model.transparent || Vec3d.scalarProduct(tri.getNormal(), new Vec3d(game.camera, tri.p[0])) < 0.0) {
+				tri.project(game.getScreenWidth() / 2, game.getScreenHeight() / 2);
+				tri.paint(g);
+			}
+			
+			
 			
 		}
 	}
